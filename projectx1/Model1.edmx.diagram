@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="53b06bb373544efb9c44c9519116f17d" Name="Diagram1">
+        <EntityTypeShape EntityType="projectxModel.Guests" Width="1.5" PointX="0.75" PointY="1.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="projectxModel.Reservations" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="projectxModel.Rooms" Width="1.5" PointX="0.75" PointY="5" IsExpanded="true" />
+        <EntityTypeShape EntityType="projectxModel.sysdiagrams" Width="1.5" PointX="2.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="projectxModel.Users" Width="1.5" PointX="4.75" PointY="4.75" IsExpanded="true" />
+        <AssociationConnector Association="projectxModel.FK_Reservations_Guests" ManuallyRouted="false" />
+        <AssociationConnector Association="projectxModel.FK_Reservations_Rooms" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
