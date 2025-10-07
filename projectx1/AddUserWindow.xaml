@@ -1,0 +1,30 @@
+﻿<Window x:Class="projectx1.AddUserWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Добавление пользователя" Height="250" Width="300"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#FF21" Offset="0.0"/>
+            <GradientStop Color="#8b00ff" Offset="1.0"/>
+        </LinearGradientBrush>
+    </Window.Background>
+    <StackPanel Margin="15">
+        <TextBlock Text="Имя пользователя:"/>
+        <TextBox x:Name="txtUsername" Margin="0,5,0,10" TextChanged="txtUsername_TextChanged"/>
+
+        <TextBlock Text="Пароль:"/>
+        <PasswordBox x:Name="txtPassword" Margin="0,5,0,10"/>
+
+        <TextBlock Text="Роль:"/>
+        <ComboBox x:Name="cmbRole" Margin="0,5,0,15">
+            <ComboBoxItem Content="Admin"/>
+            <ComboBoxItem Content="User" IsSelected="True"/>
+        </ComboBox>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="OK" Click="btnOK_Click" Width="80" Margin="0,0,10,0"/>
+            <Button Content="Отмена" Click="btnCancel_Click" Width="80"/>
+        </StackPanel>
+    </StackPanel>
+</Window>
