@@ -28,7 +28,7 @@ namespace projectx1
                 password = txtPassword.Password,
                 role = (cmbRole.SelectedItem as ComboBoxItem)?.Content.ToString(),
                 IsFirstLogin = true,
-                IsLocked = false
+                isLocked = false
             };
 
             DialogResult = true;

@@ -49,6 +49,13 @@
                 FontWeight="Bold"
                 Margin="5" Click="Save_Click"/>
 
+            <Button Content="Удалить пользователя"
+                Width="160"
+                Height="30"
+                Background="Azure"
+                Foreground="#444"
+                FontWeight="Bold"
+                Margin="5" Click="Save_Click"/>
         </StackPanel>
 
     </Grid>

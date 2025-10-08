@@ -4,12 +4,12 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="53b06bb373544efb9c44c9519116f17d" Name="Diagram1" ZoomLevel="110">
+      <Diagram DiagramId="b159191929024638bb55b75b4ae1d9bc" Name="Diagram1">
         <EntityTypeShape EntityType="projectxModel.Guests" Width="1.5" PointX="0.75" PointY="1.25" IsExpanded="true" />
         <EntityTypeShape EntityType="projectxModel.Reservations" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
-        <EntityTypeShape EntityType="projectxModel.Rooms" Width="1.5" PointX="0.625" PointY="4.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="projectxModel.sysdiagrams" Width="1.5" PointX="3" PointY="4.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="projectxModel.Users" Width="1.5" PointX="6.125" PointY="3.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="projectxModel.Rooms" Width="1.5" PointX="0.75" PointY="5" IsExpanded="true" />
+        <EntityTypeShape EntityType="projectxModel.sysdiagrams" Width="1.5" PointX="2.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="projectxModel.Users" Width="1.5" PointX="4.75" PointY="4.75" IsExpanded="true" />
         <AssociationConnector Association="projectxModel.FK_Reservations_Guests" ManuallyRouted="false" />
         <AssociationConnector Association="projectxModel.FK_Reservations_Rooms" ManuallyRouted="false" />
       </Diagram>

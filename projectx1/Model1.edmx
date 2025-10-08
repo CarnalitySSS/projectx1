@@ -116,7 +116,7 @@
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" />
           <Property Name="checkin" Type="DateTime" Precision="0" />
-          <Property Name="checkout" Type="DateTime" Precision="0" />
+          <Property Name="ckeckout" Type="DateTime" Precision="0" />
           <Property Name="guest_id" Type="Int32" />
           <Property Name="room_id" Type="Int32" />
           <NavigationProperty Name="Guests" Relationship="Self.FK_Reservations_Guests" FromRole="Reservations" ToRole="Guests" />
@@ -216,7 +216,7 @@
               <MappingFragment StoreEntitySet="Reservations">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="checkin" ColumnName="checkin" />
-                <ScalarProperty Name="checkout" ColumnName="ckeckout" />
+                <ScalarProperty Name="ckeckout" ColumnName="ckeckout" />
                 <ScalarProperty Name="guest_id" ColumnName="guest_id" />
                 <ScalarProperty Name="room_id" ColumnName="room_id" />
               </MappingFragment>

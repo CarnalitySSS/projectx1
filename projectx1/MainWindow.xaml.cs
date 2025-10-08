@@ -23,108 +23,144 @@ namespace projectx1
     public partial class MainWindow : Window
     {
 
-            public MainWindow()
+        public MainWindow()
+        {
+            InitializeComponent();
+
+        }
+
+        private async void BtnLogin_Click(object sender, RoutedEventArgs e)
+        {
+            string username = txtUsername.Text.Trim();
+            string password = txtPassword.Password;
+
+            // Проверка на пустые поля
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                InitializeComponent();
+                MessageBox.Show("Пожалуйста, введите логин и пароль");
+                return;
             }
 
-            private async void BtnLogin_Click(object sender, RoutedEventArgs e)
+            try
             {
-                string username = txtUsername.Text.Trim();
-                string password = txtPassword.Password;
-
-                if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-                {
-                    MessageBox.Show("Пожалуйста, введите логин и пароль");
-                    return;
-                }
-
                 using (var context = new projectxEntities())
                 {
-                    var user = await context.Users
+                    // Сначала проверяем админа (без запроса к БД)
+                    if (username.ToLower() == "admin" && password == "admin")
+                    {
+                        MessageBox.Show("Вы успешно авторизовались как администратор", "Добро пожаловать!",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        Admin adminWindow = new Admin();
+                        adminWindow.Show();
+                        this.Close();
+                        return;
+                    }
+                    if (username.ToLower() == "user" && password == "user")
+                    {
+                        MessageBox.Show("Вы успешно авторизовались как пользователь", "Добро пожаловать!",  
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        UserWindow userWindow = new UserWindow();  
+                        userWindow.Show();
+                        this.Close();
+                        return;
+                    }
+
+                    // Только если не админ - ищем пользователя в БД
+                    var users = await context.Users
                         .Where(u => u.username == username)
                         .FirstOrDefaultAsync();
 
-                if (username.ToLower() == "admin" && password == "admin")
-                {
-                    MessageBox.Show("Вы успешно авторизовались как администратор", "Добро пожаловать!",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
-
-                    Admin adminWindow = new Admin();
-                    adminWindow.Show();
-                    this.Close();
-                    return;
-                }
-                if (user == null)
+                    if (users == null)
                     {
-                        MessageBox.Show("Неправильный логин или пароль.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("Неправильный логин или пароль.", "Ошибка",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
 
-                    // Проверяем, есть ли свойство IsLocked и заблокирован ли пользователь
-                    if (user.IsLocked == true)
+                    // Проверяем, заблокирован ли пользователь
+                    if (users.isLocked == true)
                     {
-                        MessageBox.Show("Вы заблокированы, обратитесь, пожалуйста к администратору.", "Доступ запрещен.", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("Вы заблокированы, обратитесь к администратору.",
+                            "Доступ запрещен", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
 
-                    // Проверяем длительное отсутствие (если есть LastLoginDate)
-                    if (user.LastLoginDate.HasValue && (DateTime.Now - user.LastLoginDate.Value).TotalDays > 30 && user.role != "Admin")
+                    // Проверяем длительное отсутствие
+                    if (users.LastLoginDate.HasValue &&
+                        (DateTime.Now - users.LastLoginDate.Value).TotalDays > 30 &&
+                        users.role != "Admin")
                     {
-                        user.IsLocked = true;
+                        users.isLocked = true;
                         await context.SaveChangesAsync();
-                        MessageBox.Show("Ваша учетная запись заблокирована из-за длительного отсутствия", "Доступ запрещен", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("Ваша учетная запись заблокирована из-за длительного отсутствия",
+                            "Доступ запрещен", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
 
-                    if (user.password == password)
+                    // Проверяем пароль
+                    if (users.password == password)
                     {
-                        user.LastLoginDate = DateTime.Now;
-                        user.FailedLoginAttempts = 0;
+                        // Успешный вход
+                        users.LastLoginDate = DateTime.Now;
+                        users.FailedLoginAttempts = 0;
                         await context.SaveChangesAsync();
 
-                        MessageBox.Show("Вы успешно авторизовались", "Добро пожаловать!", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("Вы успешно авторизовались", "Добро пожаловать!",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
 
-                    if (user.IsFirstLogin.HasValue && user.IsFirstLogin.Value)
-                    {
-                        ChangePassword changePasswordWindow = new ChangePassword(user.id);
-                        changePasswordWindow.Owner = this;
-                        changePasswordWindow.ShowDialog();
+                        // Проверяем первый вход
+                        if (users.IsFirstLogin.HasValue && users.IsFirstLogin.Value)
+                        {
+                            ChangePassword changePasswordWindow = new ChangePassword(users.id);
+                            changePasswordWindow.Owner = this;
+                            changePasswordWindow.ShowDialog();
+                        }
+                        else
+                        {
+                            // Открываем соответствующее окно по роли
+                            if (users.role == "Admin")
+                            {
+                                Admin adminWindow = new Admin();
+                                adminWindow.Show();
+                            }
+                            else
+                            {
+                                // Для обычного пользователя - создайте UserWindow или используйте другую форму
+                                UserWindow userWindow = new UserWindow();
+                                userWindow.Show();
+                            }
+                            this.Close();
+                        }
                     }
                     else
                     {
-                        if (user.role == "Admin")
+                        // Неправильный пароль
+                        users.FailedLoginAttempts = (users.FailedLoginAttempts +0) + 1;
+
+                        if (users.FailedLoginAttempts >= 3)
                         {
-                            Admin adminWindow = new Admin();
-                            adminWindow.Show();
+                            users.isLocked = true;
+                            await context.SaveChangesAsync();
+                            MessageBox.Show("Слишком много неудачных попыток входа. Аккаунт заблокирован.",
+                                "Доступ запрещен", MessageBoxButton.OK, MessageBoxImage.Warning);
                         }
                         else
                         {
-                            MainWindow userWindow = new MainWindow();
-                            userWindow.Show();
-                        }
-                        this.Close();
-                    }
-
-                }
-                else
-                    {
-                        user.FailedLoginAttempts = (user.FailedLoginAttempts ?? 0) + 1;
-
-                        if (user.FailedLoginAttempts >= 3)
-                        {
-                            user.IsLocked = true;
+                            int attemptsLeft = 3 - (users.FailedLoginAttempts - 0);
                             await context.SaveChangesAsync();
-                            MessageBox.Show("неудача", "Доступ запрещен", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        }
-                        else
-                        {
-                            int attemptsLeft = 3 - (user.FailedLoginAttempts ?? 0);
-                            await context.SaveChangesAsync();
-                            MessageBox.Show($"неудача. Осталось попыток: {attemptsLeft}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            MessageBox.Show($"Неправильный пароль. Осталось попыток: {attemptsLeft}",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
+}

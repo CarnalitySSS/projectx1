@@ -22,50 +22,81 @@ namespace projectx1
     /// </summary>
     public partial class Admin : Window
     {
+        private void CheckAllEntities()
+        {
+            using (var context = new projectxEntities())
+            {
+                var props = context.GetType().GetProperties()
+                    .Where(p => p.PropertyType.IsGenericType &&
+                               p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
+                    .ToList();
+
+                string message = "Все сущности в projectxEntities:\n";
+                foreach (var prop in props)
+                {
+                    var entityType = prop.PropertyType.GetGenericArguments()[0];
+                    message += $"- {prop.Name} (тип: {entityType.Name})\n";
+                }
+                MessageBox.Show(message);
+            }
+        }
         public Admin()
         {
-            InitializeComponent();
+            InitializeComponent(); ;
             LoadUsers();
+            CheckAllEntities();
         }
 
         private async void LoadUsers()
         {
-            using (var context = new projectxEntities())
+            try
             {
-                var users = await context.Users.ToListAsync();
-                Users.ItemsSource = users;
+                using (var context = new projectxEntities())
+                { 
+                     var users = await context.Users.ToListAsync();
+                     Users.ItemsSource = users;
+                }
             }
-
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки: {ex.Message}");
+            }
         }
         private async void AddUser_Click(object sender, RoutedEventArgs e)
         {
             var newUserWindow = new AddUserWindow();
+
             if (newUserWindow.ShowDialog() == true && newUserWindow.NewUser != null)
             {
                 var newUser = newUserWindow.NewUser;
 
                 using (var context = new projectxEntities())
                 {
-                    if (await context.Users.AnyAsync(u => u.username == newUser.username))
+                    try
                     {
-                        MessageBox.Show("Пользователь с таким именем уже существует.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                    else
-                    {
-                        try
+                        // Используйте то же название, что и в LoadUsers
+                        bool userExists = await context.Users.AnyAsync(u => u.username == newUser.username);
+
+                        if (userExists)
                         {
-                            context.Users.Add(newUser);
-                            await context.SaveChangesAsync();
+                            MessageBox.Show("Пользователь с таким логином уже существует");
+                            return;
                         }
-                        catch (System.Data.Entity.Infrastructure.DbUpdateException ex)
-                        {
-                            MessageBox.Show($"Ошибка при сохранении данных: {ex.InnerException?.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
+
+                        context.Users.Add(newUser);
+                        await context.SaveChangesAsync();
+                        MessageBox.Show("Пользователь добавлен!");
+
+                        // Обновляем список
                         LoadUsers();
-                        MessageBox.Show("Пользователь успешно добавлен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка: {ex.Message}");
                     }
                 }
             }
+      
             else
             {
                 MessageBox.Show("Добавление пользователя отменено.", "Отмена", MessageBoxButton.OK, MessageBoxImage.Warning);
